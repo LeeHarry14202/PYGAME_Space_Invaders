@@ -1,30 +1,35 @@
 import WORLD
+import pygame
 
 
 class SHIP:
-    def __init__(self):
-        self.x = WORLD.SCREEN_WIDTH / 2
-        self.y = WORLD.SCREEN_HEIGHT * (4 / 5)
-        self.img = WORLD.load_image('./assets/pixel_ship_red_small.png')
-        self.rect = self.img.get_rect(center=(self.x, self.y))
-        self.VELOCITY = 1
-        self.direction = 'STAND'
+    def __init__(self, x, y, health=100):
+        self.x = x
+        self.y = y
+        self.health = health
+        self.ship_img = None
+        self.laser_img = None
+        self.laser = []
+        self.VELOCITY = 3
+
+    def get_width(self):
+        return self.ship_img.get_width()
+
+    def get_height(self):
+        return self.ship_img.get_height()
+
+    def get_rect(self):
+        return self.ship_img.get_rect(center=(self.x, self.y))
 
     def draw(self, screen):
-        # self.move_ship()
-        self.rect = self.img.get_rect(center=(self.x, self.y))
-        screen.blit(self.img, self.rect)
+        screen.blit(self.ship_img, (self.x, self.y))
 
-    def move_ship(self):
-        if self.direction == 'UP':
+    def move(self, keys):
+        if keys[pygame.K_UP] and self.y - self.VELOCITY > 0:
             self.y -= self.VELOCITY
-        elif self.direction == 'DOWN':
+        elif keys[pygame.K_DOWN] and self.y + self.VELOCITY + self.get_height() < WORLD.SCREEN_HEIGHT:
             self.y += self.VELOCITY
-        elif self.direction == 'RIGHT':
-            self.x += self.VELOCITY
-        elif self.direction == 'LEFT':
+        elif keys[pygame.K_LEFT] and self.x - self.VELOCITY > 0:
             self.x -= self.VELOCITY
-        else:
-            self.x += 0
-            self.y += 0
-        self.rect = self.img.get_rect(center=(self.x, self.y))
+        elif keys[pygame.K_RIGHT] and self.x + self.VELOCITY + self.get_width() < WORLD.SCREEN_WIDTH:
+            self.x += self.VELOCITY

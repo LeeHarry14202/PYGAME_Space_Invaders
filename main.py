@@ -1,49 +1,46 @@
 import pygame
 import sys
 import WORLD
-import SHIP
+import PLAYER
 
 pygame.init()
 
 
-SCREEN_WIDTH = WORLD.SCREEN_WIDTH
-SCREEN_HEIGHT = WORLD.SCREEN_HEIGHT
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
+screen = pygame.display.set_mode((WORLD.SCREEN_WIDTH, WORLD.SCREEN_HEIGHT))
 
 background_img = WORLD.load_image('./assets/background-black.png')
 background_img = pygame.transform.scale2x(background_img)
 
 # Object init
-ship = SHIP.SHIP()
+player = PLAYER.PLAYER(WORLD.SCREEN_WIDTH / 2, WORLD.SCREEN_HEIGHT * (4 / 5))
 
-while True:
-    screen.fill((255, 255, 255))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if WORLD.GAME_STATUS:
-                pass
-            else:
+
+def main():
+    while True:
+        screen.fill(WORLD.COLOR.BLACK)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
                     sys.exit()
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        ship.y -= ship.VELOCITY
-    elif keys[pygame.K_DOWN]:
-        ship.y += ship.VELOCITY
-    elif keys[pygame.K_LEFT]:
-        ship.x -= ship.VELOCITY
-    elif keys[pygame.K_RIGHT]:
-        ship.x += ship.VELOCITY
-    # Draw background
-    screen.blit(background_img, (0, 0))
 
-    # Draw ship
-    ship.draw(screen)
+        keys = pygame.key.get_pressed()
 
-    pygame.display.update()
+        # Draw background
+        screen.blit(background_img, (0, 0))
+        WORLD.display_text(screen, f"Lives: {player.lives}", 80, 10)
+        WORLD.display_text(screen, f"Level: {1}", 630, 10)
+
+        # Draw ship
+        player.draw(screen)
+        player.move(keys)
+
+        pygame.display.update()
+        WORLD.clock.tick(WORLD.FPS)
+
+
+if __name__ == "__main__":
+    main()
