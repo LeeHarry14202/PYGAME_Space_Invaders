@@ -1,5 +1,6 @@
 import pygame
 import sys
+import ENEMY
 import WORLD
 import PLAYER
 
@@ -13,6 +14,7 @@ background_img = pygame.transform.scale2x(background_img)
 
 # Object init
 player = PLAYER.PLAYER(WORLD.SCREEN_WIDTH / 2, WORLD.SCREEN_HEIGHT * (4 / 5))
+enemy = ENEMY.ENEMY(WORLD.SCREEN_WIDTH / 3, WORLD.SCREEN_HEIGHT / 3, "red")
 
 
 def main():
@@ -32,7 +34,7 @@ def main():
         # Draw background
         screen.blit(background_img, (0, 0))
         WORLD.display_text(screen, f"Lives: {player.lives}", 80, 10)
-        WORLD.display_text(screen, f"Level: {1}", 630, 10)
+        WORLD.display_text(screen, f"Level: {WORLD.GAME_LEVEL}", 630, 10)
 
         # Draw ship
         player.draw(screen)

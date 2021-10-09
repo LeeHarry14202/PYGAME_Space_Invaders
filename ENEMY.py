@@ -4,27 +4,26 @@ import SHIP
 import WORLD
 
 
-RED_SPACE_SHIP = WORLD.load_image('./assets/pixel_ship_red_small.png')
-RED_LASER = WORLD.load_image('./assets/pixel_laser_red.png')
-
-GREEN_SPACE_SHIP = WORLD.load_image('./assets/pixel_ship_green_small.png')
-GREEN_LASER = WORLD.load_image('./assets/pixel_laser_green.png')
-
-BLUE_SPACE_SHIP = WORLD.load_image('./assets/pixel_ship_blue_small.png')
-BLUE_LASER = WORLD.load_image('./assets/pixel_laser_blue.png')
-
-
 class ENEMY(SHIP.SHIP):
-    COLOR_MAP = {
-        "red": (RED_SPACE_SHIP, RED_LASER),
-        "green": (GREEN_SPACE_SHIP, GREEN_LASER),
-        "blue": (BLUE_SPACE_SHIP, BLUE_LASER)
-    }
-
     def __init__(self, x, y, color, health=100):
         super().__init__(x, y, health=100)
-        self.ship_img, self.laser_img = self.COLOR_MAP[color]
+        COLOR_MAP = {
+            "red": (WORLD.load_image('./assets/pixel_ship_red_small.png'),
+                    WORLD.load_image('./assets/pixel_laser_red.png')),
+            "green": (WORLD.load_image('./assets/pixel_ship_green_small.png'),
+                      WORLD.load_image('./assets/pixel_laser_green.png')),
+            "blue": (WORLD.load_image('./assets/pixel_ship_blue_small.png'),
+                     WORLD.load_image('./assets/pixel_laser_blue.png'))
+            }
+        self.ship_img, self.laser_img = COLOR_MAP[color]
         self.mask = pygame.mask.from_surface(self.ship_img)
+        self.VELOCITY = 1
+        self.enemies = []
 
-    def move(self, velocity):
-        self.y += velocity
+    def draw(self, screen):
+        for enemy in self.enemies:
+            enemy.draw(screen)
+
+    def move(self, vel):
+        self.VELOCITY = vel
+        self.y += self.VELOCITY

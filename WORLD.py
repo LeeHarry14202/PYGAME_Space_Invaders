@@ -9,6 +9,10 @@ clock = pygame.time.Clock()
 
 FPS = 120
 
+GAME_LEVEL = 0
+
+WAVE_LENGTH = 5
+
 
 def load_image(image_location):
     image = pygame.image.load(image_location). convert_alpha()
