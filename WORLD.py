@@ -1,6 +1,6 @@
 import pygame
 
-SCREEN_WIDTH = 700
+SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 700
 
 GAME_STATUS = True

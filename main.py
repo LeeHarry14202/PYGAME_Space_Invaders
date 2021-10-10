@@ -1,8 +1,8 @@
 import pygame
 import sys
-import ENEMY
+from ENEMY import ENEMY
 import WORLD
-import PLAYER
+from PLAYER import PLAYER
 
 pygame.init()
 
@@ -13,8 +13,8 @@ background_img = WORLD.load_image('./assets/background-black.png')
 background_img = pygame.transform.scale2x(background_img)
 
 # Object init
-player = PLAYER.PLAYER(WORLD.SCREEN_WIDTH / 2, WORLD.SCREEN_HEIGHT * (4 / 5))
-enemy = ENEMY.ENEMY(WORLD.SCREEN_WIDTH / 3, WORLD.SCREEN_HEIGHT / 3, "red")
+player = PLAYER(WORLD.SCREEN_WIDTH / 2, WORLD.SCREEN_HEIGHT * (4 / 5))
+enemy = ENEMY(WORLD.SCREEN_WIDTH / 3, 0, "red")
 
 
 def main():
@@ -36,9 +36,14 @@ def main():
         WORLD.display_text(screen, f"Lives: {player.lives}", 80, 10)
         WORLD.display_text(screen, f"Level: {WORLD.GAME_LEVEL}", 630, 10)
 
-        # Draw ship
+        # Draw player ship
         player.draw(screen)
         player.move(keys)
+
+        # Drww enemy ship
+        enemy.draw(screen)
+        enemy.VELOCITY = 5
+        enemy.move(enemy.VELOCITY)
 
         pygame.display.update()
         WORLD.clock.tick(WORLD.FPS)

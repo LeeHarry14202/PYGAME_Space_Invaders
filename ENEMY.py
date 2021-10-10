@@ -1,10 +1,9 @@
 import pygame.mask
-
-import SHIP
+from SHIP import SHIP
 import WORLD
 
 
-class ENEMY(SHIP.SHIP):
+class ENEMY(SHIP):
     def __init__(self, x, y, color, health=100):
         super().__init__(x, y, health=100)
         COLOR_MAP = {
@@ -20,10 +19,14 @@ class ENEMY(SHIP.SHIP):
         self.VELOCITY = 1
         self.enemies = []
 
-    def draw(self, screen):
-        for enemy in self.enemies:
-            enemy.draw(screen)
+    # def draw(self, screen):
+    #     # for enemy in self.enemies:
+    #         enemy.draw.(screen)
 
     def move(self, vel):
-        self.VELOCITY = vel
-        self.y += self.VELOCITY
+        if self.y + self.VELOCITY < WORLD.SCREEN_HEIGHT:
+            self.VELOCITY = vel
+            self.y += self.VELOCITY
+        else:
+            self.x += 50
+            self.y = 0
