@@ -45,8 +45,8 @@ def display_text(screen, text, x, y):
 
 
 def collide(obj_1, obj_2):
-    offset_x = obj_2.x = obj_2.x
-    offset_y = obj_2.y = obj_2.y
+    offset_x = int(obj_2.x) - int(obj_1.x)
+    offset_y = int(obj_2.y) - int(obj_1.y)
     # If not collide it will return None, else return (x,y)
     return obj_1.mask.overlap(obj_2.mask, (offset_x, offset_y)) is not None
 

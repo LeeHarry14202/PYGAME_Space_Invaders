@@ -1,6 +1,7 @@
 import WORLD
 import pygame
-from LASER import  LASER
+from LASER import LASER
+
 
 class SHIP:
     COOLDOWN = 30
@@ -26,6 +27,19 @@ class SHIP:
 
     def draw(self, screen):
         screen.blit(self.ship_img, (self.x, self.y))
+        for laser in self.lasers:
+            laser.draw(screen)
+
+    def move_laser(self, vel, obj):
+        self.cooldown()
+        for laser_ in self.lasers:
+            laser_.move(vel)
+            if laser_.off_screen(WORLD.SCREEN_HEIGHT):
+                self.lasers.remove(laser_)
+            elif laser_.collision(obj):
+                print("Touch")
+                obj.health -= 10
+                self.lasers.remove(laser_)
 
     def move(self, keys):
         if keys[pygame.K_UP] and self.y - self.VELOCITY > 0:
@@ -36,15 +50,17 @@ class SHIP:
             self.x -= self.VELOCITY
         elif keys[pygame.K_RIGHT] and self.x + self.VELOCITY + self.get_width() < WORLD.SCREEN_WIDTH:
             self.x += self.VELOCITY
+        elif keys[pygame.K_SPACE]:
+            self.shoot()
 
     def cooldown(self):
         if self.cool_down_counter >= self.COOLDOWN:
-            pass
+            self.cool_down_counter = 0
+        elif self.cool_down_counter > 0:
+            self.cool_down_counter += 1
 
     def shoot(self):
         if self.cool_down_counter == 0:
             laser = LASER(self.x, self.y, self.laser_img)
             self.lasers.append(laser)
-            self.cool_down_counter = 0
-
-
+            self.cool_down_counter = 1

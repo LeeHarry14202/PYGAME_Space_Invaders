@@ -4,7 +4,7 @@ import random
 from ENEMY import ENEMY
 import WORLD
 from PLAYER import PLAYER
-
+from LASER import LASER
 pygame.init()
 
 
@@ -30,6 +30,13 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     run = False
 
+        keys = pygame.key.get_pressed()
+
+        # Draw background
+        screen.blit(background_img, (0, 0))
+        WORLD.display_text(screen, f"Lives: {player.lives}", 80, 10)
+        WORLD.display_text(screen, f"Level: {WORLD.GAME_LEVEL}", 630, 10)
+
         # Create enemy
         if len(enemies) == 0:
             WORLD.GAME_LEVEL += 1
@@ -39,30 +46,28 @@ def main():
                                # Random x position
                                random.randrange(player.get_width(), WORLD.SCREEN_WIDTH - player.get_width()),
                                # Random y position
-                               random.randrange(-WORLD.SCREEN_HEIGHT, -500),
+                               random.randrange(-WORLD.SCREEN_HEIGHT, -200),
                                # Random color ship
                                random.choice(["red", "green", "blue"]))
                 enemies.append(enemy_)
-
-        keys = pygame.key.get_pressed()
-
-        # Draw background
-        screen.blit(background_img, (0, 0))
-        WORLD.display_text(screen, f"Lives: {player.lives}", 80, 10)
-        WORLD.display_text(screen, f"Level: {WORLD.GAME_LEVEL}", 630, 10)
-
-        # Draw player ship
-        player.draw(screen)
-        player.move(keys)
 
         # Draw enemy ship
         for enemy_ in enemies:
             enemy_.draw(screen)
             enemy_.move(1)
+            enemy_.move_laser(LASER.laser_vel, player)
+
+            if random.randrange(0, 4*WORLD.FPS) == 1:
+                enemy_.shoot()
+
             if enemy_.y + enemy_.get_height() > WORLD.SCREEN_HEIGHT:
                 player.lives -= 1
                 enemies.remove(enemy_)
 
+        # Draw player ship
+        player.draw(screen)
+        player.move(keys)
+        player.move_laser(-LASER.laser_vel, enemies)
 
         pygame.display.update()
         WORLD.clock.tick(WORLD.FPS)

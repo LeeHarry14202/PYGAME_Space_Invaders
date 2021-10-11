@@ -4,8 +4,8 @@ import WORLD
 
 
 class ENEMY(SHIP):
-    def __init__(self, x, y, color="red", health=100):
-        super().__init__(x, y, health=100)
+    def __init__(self, x, y, color="red"):
+        super().__init__(x, y)
         COLOR_MAP = {
             "red": (WORLD.load_image('./assets/pixel_ship_red_small.png'),
                     WORLD.load_image('./assets/pixel_laser_red.png')),
@@ -20,5 +20,3 @@ class ENEMY(SHIP):
 
     def move(self, vel):
         self.y += vel
-
-
