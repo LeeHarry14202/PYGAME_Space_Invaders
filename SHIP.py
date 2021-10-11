@@ -1,16 +1,19 @@
 import WORLD
 import pygame
-
+from LASER import  LASER
 
 class SHIP:
+    COOLDOWN = 30
+
     def __init__(self, x, y, health=100):
         self.x = x
         self.y = y
         self.health = health
         self.ship_img = None
         self.laser_img = None
-        self.laser = []
+        self.lasers = []
         self.VELOCITY = 3
+        self.cool_down_counter = 0
 
     def get_width(self):
         return self.ship_img.get_width()
@@ -33,3 +36,15 @@ class SHIP:
             self.x -= self.VELOCITY
         elif keys[pygame.K_RIGHT] and self.x + self.VELOCITY + self.get_width() < WORLD.SCREEN_WIDTH:
             self.x += self.VELOCITY
+
+    def cooldown(self):
+        if self.cool_down_counter >= self.COOLDOWN:
+            pass
+
+    def shoot(self):
+        if self.cool_down_counter == 0:
+            laser = LASER(self.x, self.y, self.laser_img)
+            self.lasers.append(laser)
+            self.cool_down_counter = 0
+
+

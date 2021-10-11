@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 from ENEMY import ENEMY
 import WORLD
 from PLAYER import PLAYER
@@ -14,11 +15,12 @@ background_img = pygame.transform.scale2x(background_img)
 
 # Object init
 player = PLAYER(WORLD.SCREEN_WIDTH / 2, WORLD.SCREEN_HEIGHT * (4 / 5))
-enemy = ENEMY(WORLD.SCREEN_WIDTH / 3, 0, "red")
+enemies = []
 
 
 def main():
-    while True:
+    run = True
+    while run:
         screen.fill(WORLD.COLOR.BLACK)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -26,8 +28,21 @@ def main():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
+                    run = False
+
+        # Create enemy
+        if len(enemies) == 0:
+            WORLD.GAME_LEVEL += 1
+            WORLD.WAVE_LENGTH += 1
+            for i in range(WORLD.WAVE_LENGTH):
+                enemy_ = ENEMY(
+                               # Random x position
+                               random.randrange(player.get_width(), WORLD.SCREEN_WIDTH - player.get_width()),
+                               # Random y position
+                               random.randrange(-WORLD.SCREEN_HEIGHT, -500),
+                               # Random color ship
+                               random.choice(["red", "green", "blue"]))
+                enemies.append(enemy_)
 
         keys = pygame.key.get_pressed()
 
@@ -40,10 +55,14 @@ def main():
         player.draw(screen)
         player.move(keys)
 
-        # Drww enemy ship
-        enemy.draw(screen)
-        enemy.VELOCITY = 5
-        enemy.move(enemy.VELOCITY)
+        # Draw enemy ship
+        for enemy_ in enemies:
+            enemy_.draw(screen)
+            enemy_.move(1)
+            if enemy_.y + enemy_.get_height() > WORLD.SCREEN_HEIGHT:
+                player.lives -= 1
+                enemies.remove(enemy_)
+
 
         pygame.display.update()
         WORLD.clock.tick(WORLD.FPS)

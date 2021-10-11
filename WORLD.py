@@ -1,6 +1,6 @@
 import pygame
 
-SCREEN_WIDTH = 800
+SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
 
 GAME_STATUS = True
@@ -11,7 +11,7 @@ FPS = 120
 
 GAME_LEVEL = 0
 
-WAVE_LENGTH = 5
+WAVE_LENGTH = 1
 
 
 def load_image(image_location):
@@ -42,3 +42,11 @@ def display_text(screen, text, x, y):
 
     # blit wil draw the text on screen
     screen.blit(game_over_surface, game_over_rect)
+
+
+def collide(obj_1, obj_2):
+    offset_x = obj_2.x = obj_2.x
+    offset_y = obj_2.y = obj_2.y
+    # If not collide it will return None, else return (x,y)
+    return obj_1.mask.overlap(obj_2.mask, (offset_x, offset_y)) is not None
+
