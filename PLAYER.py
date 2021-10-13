@@ -22,4 +22,19 @@ class PLAYER(SHIP):
                 for enemy in enemies:
                     if laser_.collision(enemy):
                         enemies.remove(enemy)
-                        self.lasers.remove(laser_)
+                        if laser_ in self.lasers:
+                            self.lasers.remove(laser_)
+
+    def health_bar(self, screen):
+        healthbar_height = 10
+        healthbar_y_pos = self.y + self.ship_img.get_height() + healthbar_height
+        healthbar_width = self.ship_img.get_width()
+
+        pygame.draw.rect(screen, WORLD.COLOR.RED, (self.x, healthbar_y_pos, healthbar_width, healthbar_height))
+        pygame.draw.rect(screen, WORLD.COLOR.GREEN, (self.x, healthbar_y_pos, healthbar_width * (self.health / self.max_health), healthbar_height))
+
+    def draw(self, screen):
+        # Draw player ship
+        super().draw(screen)
+        # Draw health bar
+        self.health_bar(screen)

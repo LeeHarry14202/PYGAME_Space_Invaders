@@ -3,16 +3,16 @@ import pygame
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 700
 
-GAME_STATUS = True
-
 clock = pygame.time.Clock()
-
 FPS = 120
 
-GAME_LEVEL = 0
 
+GAME_STATUS = True
+GAME_LEVEL = 0
+# Number of enemy ship
 WAVE_LENGTH = 1
 
+COUNT_TIME = 0
 
 def load_image(image_location):
     image = pygame.image.load(image_location). convert_alpha()
@@ -23,6 +23,7 @@ class COLOR:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     RED = (255, 0, 0)
+    GREEN = (0, 255, 0)
 
 
 def display_text(screen, text, x, y):
