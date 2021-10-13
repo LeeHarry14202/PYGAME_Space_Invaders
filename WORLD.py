@@ -14,6 +14,7 @@ WAVE_LENGTH = 1
 
 COUNT_TIME = 0
 
+
 def load_image(image_location):
     image = pygame.image.load(image_location). convert_alpha()
     return image

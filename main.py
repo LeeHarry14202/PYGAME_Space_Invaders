@@ -180,17 +180,18 @@ def main():
                     if event.key == pygame.K_ESCAPE:
                         run = False
                     if event.key == pygame.K_SPACE:
+                        WORLD.COUNT_TIME = 0
                         # Reset game play
                         enemies.clear()
 
-                    player.x = WORLD.SCREEN_WIDTH / 2
-                    player.y = WORLD.SCREEN_HEIGHT / 2
-                    player.lasers.clear()
-                    player.health = 100
+                        player.x = WORLD.SCREEN_WIDTH / 2
+                        player.y = WORLD.SCREEN_HEIGHT / 2
+                        player.lasers.clear()
+                        player.health = 100
 
-                    WORLD.GAME_LEVEL = 0
-                    WORLD.WAVE_LENGTH = 1
-                    WORLD.GAME_STATUS = True
+                        WORLD.GAME_LEVEL = 0
+                        WORLD.WAVE_LENGTH = 1
+                        WORLD.GAME_STATUS = True
 
         # Draw background
         screen.blit(background_img, (0, 0))
@@ -227,14 +228,12 @@ def main():
                     # Enemy have 50% / FPS to shoot
                     enemy_.shoot()
                 # Check if the enemy ship collide player ship
-                if WORLD.collide(enemy_, player):
+                if WORLD.collide(enemy_, player) or player.health <= 0 or player.lives <= 0:
                     WORLD.GAME_STATUS = False
                 # If the enemy ship go out off screen, player will lose lives
                 elif enemy_.y + enemy_.get_height() > WORLD.SCREEN_HEIGHT:
                     player.lives -= 1
                     enemies.remove(enemy_)
-                if player.health <= 0:
-                    WORLD.GAME_STATUS = False
 
             keys = pygame.key.get_pressed()
             # Draw player ship
