@@ -1,10 +1,7 @@
 import pygame
 import sys
 import random
-# import WORLD
-# from ENEMY import ENEMY
-# from PLAYER import PLAYER
-# from LASER import LASER
+import numpy as np
 
 pygame.init()
 
@@ -29,9 +26,16 @@ class COLOR:
     GREEN = (0, 255, 0)
 
 
-def display_text(text, x, y):
+# Load background image
+background_img = load_image('./assets/background-black.png')
+background_img = pygame.transform.scale2x(background_img)
+
+hear_img = load_image('./assets/pixel-heart.png')
+hear_img = pygame.transform.scale(hear_img, (50,50))
+
+def display_text(text, x, y, size):
     # creating font object my_font
-    my_font = pygame.font.SysFont('times new roman', 25)
+    my_font = pygame.font.SysFont('times new roman', size)
 
     # creating a text surface on which text
     # will be drawn
@@ -53,11 +57,6 @@ def collide(obj_1, obj_2):
     offset_y = int(obj_2.y) - int(obj_1.y)
     # If not collide it will return None, else return (x,y)
     return obj_1.mask.overlap(obj_2.mask, (offset_x, offset_y)) is not None
-
-
-# Load background image
-background_img = load_image('./assets/background-black.png')
-background_img = pygame.transform.scale2x(background_img)
 
 
 class SHIP:
@@ -129,6 +128,7 @@ class SHIP:
             self.cool_down_counter = 1
 
 
+
 class PLAYER(SHIP):
     def __init__(self, x, y, health=100):
         super().__init__(x, y, health=100)
@@ -164,6 +164,9 @@ class PLAYER(SHIP):
         super().draw()
         # Draw health bar
         self.health_bar()
+
+    def collision(self, obj):
+        return collide(self, obj)
 
 
 class ENEMY(SHIP):
@@ -206,6 +209,10 @@ class LASER:
     def collision(self, obj):
         return collide(self, obj)
 
+def update_score(score, high_score):
+    if score > high_score:
+        high_score = score
+    return high_score
 
 # Object init
 player = PLAYER(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
@@ -217,7 +224,8 @@ def main():
     GAME_LEVEL = 0
     # Number of enemy ship
     WAVE_LENGTH = 1
-    COUNT_TIME = 0
+    COUNT_TIME = 3500
+    HIGH_SCORE = 0
     run = True
     while run:
         screen.fill(COLOR.BLACK)
@@ -226,17 +234,18 @@ def main():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                if GAME_STATUS is False and COUNT_TIME >= 400:
+                if GAME_STATUS is False and COUNT_TIME == 0:
                     if event.key == pygame.K_ESCAPE:
                         run = False
                     if event.key == pygame.K_SPACE:
-                        COUNT_TIME = 0
+                        COUNT_TIME = 3500
                         # Reset game play
                         enemies.clear()
 
                         player.x = SCREEN_WIDTH / 2
                         player.y = SCREEN_HEIGHT / 2
                         player.lasers.clear()
+                        player.lives = 10
                         player.health = 100
 
                         GAME_LEVEL = 0
@@ -247,56 +256,64 @@ def main():
         screen.blit(background_img, (0, 0))
 
         if GAME_STATUS:
-            # 80, 10 is pos of x and y
-            display_text(f"Lives: {player.lives}", 80, 10)
-            # 630 , 10 is pos of x and y
-            display_text(f"Level: {GAME_LEVEL}", 630, 10)
+            if COUNT_TIME > 0:
+                if int(COUNT_TIME / 1000) == 0:
+                    display_text(f"START!!!", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2, size=50)
+                else:
+                    display_text(f"{int(COUNT_TIME / 1000)}", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2, size=50)
+                COUNT_TIME -= 10
+            else:
+                for x_pos in np.arange(0, 20*player.lives, 20):
+                    screen.blit(hear_img, (x_pos,5))
+                display_text(f"Level: {GAME_LEVEL}", x=630, y=10, size=25)
 
-            # Create enemy ship
-            if len(enemies) == 0:
-                GAME_LEVEL += 1
-                WAVE_LENGTH += 1
-                for i in range(WAVE_LENGTH):
-                    # Enemy init
-                    enemy_ = ENEMY(
-                                   # Random x position
-                                   random.randrange(player.get_width(), SCREEN_WIDTH - player.get_width()),
-                                   # Random y position
-                                   random.randrange(-SCREEN_HEIGHT, -200),
-                                   # Random color ship
-                                   random.choice(["red", "green", "blue"]))
-                    enemies.append(enemy_)
+                # Create enemy ship
+                if len(enemies) == 0:
+                    GAME_LEVEL += 1
+                    WAVE_LENGTH += 1
+                    for i in range(WAVE_LENGTH):
+                        # Enemy init
+                        enemy_ = ENEMY(
+                                       # Random x position
+                                       random.randrange(player.get_width(), SCREEN_WIDTH - player.get_width()),
+                                       # Random y position
+                                       random.randrange(-SCREEN_HEIGHT, -200),
+                                       # Random color ship
+                                       random.choice(["red", "green", "blue"]))
+                        enemies.append(enemy_)
 
-            # Draw enemy ship
-            for enemy_ in enemies:
-                enemy_.draw()
-                enemy_vel = random.randrange(1, 3)
-                enemy_.move(enemy_vel)
-                enemy_.move_laser(LASER.laser_vel, player)
-                # Enemy wil shoot randomly
-                if random.randrange(0, 2*FPS) == 1:
-                    # Enemy have 50% / FPS to shoot
-                    enemy_.shoot()
-                # Check if the enemy ship collide player ship
-                if collide(enemy_, player) or player.health <= 0 or player.lives <= 0:
-                    GAME_STATUS = False
-                # If the enemy ship go out off screen, player will lose lives
-                elif enemy_.y + enemy_.get_height() > SCREEN_HEIGHT:
-                    player.lives -= 1
-                    enemies.remove(enemy_)
+                # Draw enemy ship
+                for enemy_ in enemies:
+                    enemy_.draw()
+                    enemy_vel = random.randrange(1, 3)
+                    enemy_.move(enemy_vel)
+                    enemy_.move_laser(LASER.laser_vel, player)
+                    # Enemy wil shoot randomly
+                    if random.randrange(0, 2*FPS) == 1:
+                        # Enemy have 50% / FPS to shoot
+                        enemy_.shoot()
+                    # Check if the enemy ship collide player ship
+                    if collide(enemy_, player) or player.health <= 0 or player.lives <= 0:
+                        GAME_STATUS = False
+                    # If the enemy ship go out off screen, player will lose lives
+                    elif enemy_.y + enemy_.get_height() > SCREEN_HEIGHT:
+                        player.lives -= 1
+                        enemies.remove(enemy_)
 
-            keys = pygame.key.get_pressed()
-            # Draw player ship
-            player.draw()
-            player.move(keys)
-            # Move and check if laser collide enemy ship
-            player.move_laser(-LASER.laser_vel, enemies)
+                keys = pygame.key.get_pressed()
+                # Draw player ship
+                player.draw()
+                player.move(keys)
+                # Move and check if laser collide enemy ship
+                player.move_laser(-LASER.laser_vel, enemies)
         else:
-            display_text(f"YOU LOST", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-            display_text(f"TAB SPACE TO PLAY AGAIN", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 50)
-            display_text(f"TAB ESC TO EXIT", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 100)
-            COUNT_TIME += 1
-        pygame.display.update()
+            display_text(f"YOUR SCORE: {GAME_LEVEL}", x=SCREEN_WIDTH / 2, y=50, size=25)
+            HIGH_SCORE = update_score(GAME_LEVEL, HIGH_SCORE)
+            display_text(f"HIGH SCORE: {HIGH_SCORE}", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT * (4/5), size=25)
+            display_text(f"YOU LOST", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2 - 50, size=25)
+            display_text(f"TAB SPACE TO PLAY AGAIN", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2 , size=25)
+            display_text(f"TAB ESC TO EXIT", x=SCREEN_WIDTH / 2, y=SCREEN_HEIGHT / 2 + 50, size=25)
+        pygame.display.update(),
         clock.tick(FPS)
 
 
